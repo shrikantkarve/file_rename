@@ -11,7 +11,7 @@ def parse():
     global params
     global parser
     parser.add_argument("--dirpath", "-p", help="Provide a path to directory to rename the files",
-                        action="store", default = "c:\sample_data", dest="dpath")
+                        action="store", required=True, dest="dpath")
     parser.add_argument("--starts-with", "-s", help="Find files that start with the provided string",
                         action="store", default="", dest="swith")
     parser.add_argument("--ends-with", "-e", help="Find files that end with the provided string",
@@ -19,11 +19,11 @@ def parse():
     parser.add_argument("--quiet", "-q", action="store_false", default=True, dest="verbose")
     parser.add_argument("--verbose", "-v", action="store_true", default=True, dest="verbose")
     parser.add_argument("--name", "-n", action="store",help="Provide base name for files to rename with",
-                        default="file", dest="fname")
+                        required=True, dest="fname")
     parser.add_argument("--startcount", type=int, action="store",help="Provide base name for files to rename with",
                         default=0, dest="startcount")
     parser.add_argument("--limitcount", type=int, action="store",help="Provide base name for files to rename with",
-                        default=10, dest="limitcount")
+                        default=0, dest="limitcount")
     parser.add_argument("--dryrun", action="store_true",default=False,
                         help="Perform only a dry run and print name change summary",
                         dest="dryrun")                    
@@ -53,7 +53,10 @@ def filter_files(fileset):
 def create_new_filenames(fileset):
     filenameset = []
     cwidth = len(str(params.startcount + params.limitcount))
-    tgt_count = min(len(fileset), params.limitcount)
+    if params.limitcount == 0:
+        tgt_count = len(fileset)
+    else:
+        tgt_count = min(len(fileset), params.limitcount)
     for i in range(params.startcount, params.startcount + tgt_count):
         name = f"{params.fname}{str(i).zfill(cwidth)}"
         filenameset.append(name)
